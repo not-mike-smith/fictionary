@@ -1,0 +1,29 @@
+{
+  "name": "moctionary",
+  "version": "0.0.1",
+  "description": "Simple dictionary implemented as a flat object",
+  "main": "index.ts",
+  "scripts": {
+    "test": "TODO"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/not-mike-smith/moctionary.git"
+  },
+  "keywords": [
+    "javascript",
+    "typescript",
+    "dictionary",
+    "hashmap",
+    "fake"
+  ],
+  "author": "not-mike-smith",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/not-mike-smith/moctionary/issues"
+  },
+  "homepage": "https://github.com/not-mike-smith/moctionary#readme",
+  "dependencies": {
+    "fp-ts": "^2.0.0"
+  }
+}
