@@ -1,5 +1,5 @@
 {
-  "name": "moctionary",
+  "name": "fictionary",
   "version": "0.1.0",
   "description": "Simple dictionary implemented as a flat object",
   "main": "index.ts",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/not-mike-smith/moctionary.git"
+    "url": "git+https://github.com/not-mike-smith/fictionary.git"
   },
   "keywords": [
     "javascript",
@@ -20,9 +20,9 @@
   "author": "not-mike-smith",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/not-mike-smith/moctionary/issues"
+    "url": "https://github.com/not-mike-smith/fictionary"
   },
-  "homepage": "https://github.com/not-mike-smith/moctionary#readme",
+  "homepage": "https://github.com/not-mike-smith/fictionary#readme",
   "dependencies": {
     "fp-ts": "^2.0.0"
   }
