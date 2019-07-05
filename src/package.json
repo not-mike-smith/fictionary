@@ -1,6 +1,6 @@
 {
   "name": "moctionary",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Simple dictionary implemented as a flat object",
   "main": "index.ts",
   "scripts": {
