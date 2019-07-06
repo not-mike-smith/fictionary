@@ -1,6 +1,6 @@
 {
   "name": "fictionary",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Simple dictionary implemented as a flat object",
   "main": "index.ts",
   "scripts": {
