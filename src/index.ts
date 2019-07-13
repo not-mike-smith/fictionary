@@ -1,6 +1,6 @@
-import { Option, fromNullable, isNone, exists, isSome } from "fp-ts/lib/Option";
+import { Option, fromNullable, isNone, exists, isSome, fold, getOrElse } from "fp-ts/lib/Option";
 
-namespace Moctionary {
+namespace Fictionary {
 	export interface HackMap<TValue> {
 		readonly [index: string]: TValue;
 	}
@@ -9,9 +9,16 @@ namespace Moctionary {
 
 	export const containsKey = <TValue>(hackMap: HackMap<TValue>) => (key: string) => hackMap[key] !== undefined;
 
-	export const getValue = <TValue>(hackMap: HackMap<TValue>) => (key: string): TValue | undefined => hackMap[key];
+	const unsafeGetValue = <TValue>(hackMap: HackMap<TValue>) => (key: string): TValue => hackMap[key];
 
 	export const get = <TValue>(hackMap: HackMap<TValue>) => (key: string): Option<TValue> => fromNullable(hackMap[key]);
+
+	export const getOrThrow = <TValue>(hackMap: HackMap<TValue>) => (key: string): TValue => {
+		const opt = get(hackMap)(key);
+		if (isNone(opt)) throw ReferenceError(`no non-null value exists for key, '${key}'`);
+
+		return opt.value;
+	}
 
 	export const removeAt = <TValue>(hackMap: HackMap<TValue>) => (key: string): HackMap<TValue> => {
 		const ret = {...hackMap};
@@ -38,6 +45,19 @@ namespace Moctionary {
 		return setValue(hackMap)(key)(value);
 	}
 
+	export const keys = <TValue>(hackMap: HackMap<TValue>): string[] => Object.keys(hackMap);
+
+	export const values = <TValue>(hackMap: HackMap<TValue>): TValue[] => keys(hackMap).map(unsafeGetValue(hackMap));
+
+	export const pairs = <TValue>(hackMap: HackMap<TValue>) => {
+		const unsafeGetValue_ = unsafeGetValue(hackMap);
+		const f = (key: string) => ({ key, value: unsafeGetValue_(key) });
+
+		return keys(hackMap).map(f);
+	}
+
+	export const getValue = <TValue>(hackMap: HackMap<TValue>) => (key: string): TValue | undefined => hackMap[key];
+
 	export interface HackMapper<TValue> {
 		readonly containsKey: (hackMap: HackMap<TValue>) => (key: string) => boolean;
 		readonly get: (hackMap: HackMap<TValue>) => (key: string) => Option<TValue>;
@@ -47,6 +67,9 @@ namespace Moctionary {
 		readonly removeAt: (hackMap: HackMap<TValue>) => (key: string) => HackMap<TValue>;
 		readonly remove: (hackMap: HackMap<TValue>) => (value: TValue) => HackMap<TValue>;
 		readonly tryAddValue: (hackMap: HackMap<TValue>) => (value: TValue) => HackMap<TValue>;
+		readonly keys: (hackMap: HackMap<TValue>) => string[];
+		readonly values: (hackMap: HackMap<TValue>) => TValue[];
+		readonly pairs: (hackMap: HackMap<TValue>) => { key: string, value: TValue }[];
 	}
 
 	export const createHackMapper = <TValue>(getKey: (value: TValue) => string): HackMapper<TValue> => Object.freeze({
@@ -54,18 +77,23 @@ namespace Moctionary {
 		get,
 		getValue,
 		removeAt,
+		keys,
+		values,
+		pairs,
 		set: (hackMap: HackMap<TValue>) => (value: Option<TValue>) => isNone(value) ? hackMap : set(hackMap)(getKey(value.value))(value),
 		setValue: (hackMap: HackMap<TValue>) => (value: TValue) => setValue(hackMap)(getKey(value))(value),
 		remove: (hackMap: HackMap<TValue>) => (value: TValue) => removeAt(hackMap)(getKey(value)),
 		tryAddValue: (hackMap: HackMap<TValue>) => (value: TValue) => tryAddValue(hackMap)(getKey(value))(value),
 	});
 
-	export class Moctionary<T> {
-		private _hackMap: HackMap<T> = emptyHackMap();
+	export class Fictionary<T> {
+		private _hackMap: HackMap<T>;
 		private readonly _hackMapper: HackMapper<T>;
 
-		constructor(getKey: (value: T) => string) {
+		constructor(getKey: (value: T) => string, hackMap: HackMap<T> = emptyHackMap()) {
 			this._hackMapper = createHackMapper(getKey);
+			this._hackMap = hackMap;
+			this.currentHackMap;
 			this.containsKey = this.containsKey.bind(this);
 			this.get = this.get.bind(this);
 			this.set = this.set.bind(this);
@@ -74,6 +102,13 @@ namespace Moctionary {
 			this.removeAt = this.removeAt.bind(this);
 			this.remove = this.remove.bind(this);
 			this.tryAddValue  = this.tryAddValue.bind(this);
+			this.keys = this.keys.bind(this);
+			this.values = this.values.bind(this);
+			this.pairs = this.pairs.bind(this);
+		}
+
+		public currentHackMap() {
+			return this._hackMap;
 		}
 
 		public containsKey(key: string) {
@@ -107,7 +142,19 @@ namespace Moctionary {
 		public tryAddValue(value: T) {
 			this._hackMap = this._hackMapper.tryAddValue(this._hackMap)(value);
 		}
+
+		public keys() {
+			return this._hackMapper.keys(this._hackMap);
+		}
+
+		public values() {
+			return this._hackMapper.values(this._hackMap);
+		}
+
+		public pairs() {
+			return this._hackMapper.pairs(this._hackMap);
+		}
 	}
 }
 
-export default Moctionary;
+export default Fictionary;
