@@ -86,9 +86,9 @@ namespace Fictionary {
 		tryAddValue: (hackMap: HackMap<TValue>) => (value: TValue) => tryAddValue(hackMap)(getKey(value))(value),
 	});
 
-	export class Fictionary<T> {
-		private _hackMap: HackMap<T>;
-		private readonly _hackMapper: HackMapper<T>;
+	export class AppendOnlyFictionary<T> {
+		protected _hackMap: HackMap<T>;
+		protected readonly _hackMapper: HackMapper<T>;
 
 		constructor(getKey: (value: T) => string, hackMap: HackMap<T> = emptyHackMap()) {
 			this._hackMapper = createHackMapper(getKey);
@@ -96,11 +96,7 @@ namespace Fictionary {
 			this.currentHackMap;
 			this.containsKey = this.containsKey.bind(this);
 			this.get = this.get.bind(this);
-			this.set = this.set.bind(this);
 			this.getValue = this.getValue.bind(this);
-			this.setValue = this.setValue.bind(this);
-			this.removeAt = this.removeAt.bind(this);
-			this.remove = this.remove.bind(this);
 			this.tryAddValue  = this.tryAddValue.bind(this);
 			this.keys = this.keys.bind(this);
 			this.values = this.values.bind(this);
@@ -119,24 +115,8 @@ namespace Fictionary {
 			return this._hackMapper.get(this._hackMap)(key);
 		}
 
-		public set(value: Option<T>) {
-			this._hackMap = this._hackMapper.set(this._hackMap)(value);
-		}
-
 		public getValue(key: string) {
 			return this._hackMapper.getValue(this._hackMap)(key);
-		}
-
-		public setValue(value: T) {
-			this._hackMap = this._hackMapper.setValue(this._hackMap)(value);
-		}
-
-		public removeAt(key: string) {
-			this._hackMap = this._hackMapper.removeAt(this._hackMap)(key);
-		}
-
-		public remove(value: T) {
-			this._hackMap = this._hackMapper.remove(this._hackMap)(value);
 		}
 
 		public tryAddValue(value: T) {
@@ -153,6 +133,37 @@ namespace Fictionary {
 
 		public pairs() {
 			return this._hackMapper.pairs(this._hackMap);
+		}
+	}
+
+	export class Fictionary<T> extends AppendOnlyFictionary<T> {
+		constructor(getKey: (value: T) => string, hackMap: HackMap<T> = emptyHackMap()) {
+			super(getKey, hackMap)
+			this.set = this.set.bind(this);
+			this.setValue = this.setValue.bind(this);
+			this.removeAt = this.removeAt.bind(this);
+			this.remove = this.remove.bind(this);
+			this.clear = this.clear.bind(this);
+		}
+
+		public set(value: Option<T>) {
+			this._hackMap = this._hackMapper.set(this._hackMap)(value);
+		}
+
+		public setValue(value: T) {
+			this._hackMap = this._hackMapper.setValue(this._hackMap)(value);
+		}
+
+		public removeAt(key: string) {
+			this._hackMap = this._hackMapper.removeAt(this._hackMap)(key);
+		}
+
+		public remove(value: T) {
+			this._hackMap = this._hackMapper.remove(this._hackMap)(value);
+		}
+
+		public clear() {
+			this._hackMap = emptyHackMap();
 		}
 	}
 }
