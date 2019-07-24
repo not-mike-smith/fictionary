@@ -4,7 +4,7 @@
   "description": "Simple dictionary implemented as a flat object",
   "main": "index.ts",
   "scripts": {
-    "test": "npm run test"
+    "test": "jest --coverage"
   },
   "repository": {
     "type": "git",
@@ -25,5 +25,11 @@
   "homepage": "https://github.com/not-mike-smith/fictionary#readme",
   "dependencies": {
     "fp-ts": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.5.3"
   }
 }
