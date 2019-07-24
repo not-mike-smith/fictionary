@@ -1,7 +1,7 @@
 {
 	"scripts": {
 		"compile": "tsc",
-		"test": "jest"
+		"test": "jest --coverage --watchAll=false"
 	},
 	"dependencies": {
 		"@types/jest": "^24.0.15",
