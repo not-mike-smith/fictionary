@@ -1,8 +1,8 @@
 {
   "name": "fictionary",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Simple dictionary implemented as a flat object",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "scripts": {
     "test": "npx jest --coverage"
   },
@@ -24,6 +24,12 @@
   },
   "homepage": "https://github.com/not-mike-smith/fictionary#readme",
   "dependencies": {
-    "fp-ts": "^2.0.0"
+    "fp-ts": "^2.0.0",
+    "typescript": "^3.5.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.16",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2"
   }
 }
