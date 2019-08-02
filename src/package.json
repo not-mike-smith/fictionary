@@ -4,7 +4,7 @@
   "description": "Simple dictionary implemented as a flat object",
   "main": "index.ts",
   "scripts": {
-    "test": "npm run test"
+    "test": "npx jest --coverage"
   },
   "repository": {
     "type": "git",
