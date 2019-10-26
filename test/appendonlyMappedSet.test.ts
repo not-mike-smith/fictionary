@@ -1,12 +1,12 @@
 import "jest";
 import { Organism, human, dog, direwolf, scientificName } from "./organism";
-import { AppendOnlyFictionary } from "../src/index";
+import { AppendonlyMappedSet } from "../src/index";
 
-let fict: AppendOnlyFictionary<Organism>;
+let fict: AppendonlyMappedSet<Organism>;
 
 describe("empty AppendOnlyFictionary", () => {
 	beforeEach(() => {
-		fict = new AppendOnlyFictionary(scientificName);
+		fict = new AppendonlyMappedSet(scientificName);
 	});
 
 	test("tryAddValue", () => {
@@ -47,6 +47,6 @@ describe("empty AppendOnlyFictionary", () => {
 		expect(copy).not.toBe(fict);
 		expect(copy.contains(human())).toBe(true);
 		expect(copy.contains(dog())).toBe(true);
-		expect(() => (copy as AppendOnlyFictionary<Organism>).tryAddValue(direwolf())).toThrowError();
+		expect(() => (copy as AppendonlyMappedSet<Organism>).tryAddValue(direwolf())).toThrowError();
 	});
 });

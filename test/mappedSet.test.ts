@@ -1,14 +1,14 @@
 import "jest";
 import { some, none } from "fp-ts/lib/Option";
 import { Organism, human, dog, direwolf, scientificName } from "./organism";
-import Fictionary, { AppendOnlyFictionary } from "../src/index";
+import MappedSet, { AppendonlyMappedSet } from "../src/index";
 import { kMaxLength } from "buffer";
 
-let fict: Fictionary<Organism>;
+let fict: MappedSet<Organism>;
 
 describe("empty Fictionary", () => {
 	beforeEach(() => {
-		fict = new Fictionary(scientificName);
+		fict = new MappedSet(scientificName);
 	});
 
 	test("set some", () => {
@@ -47,7 +47,7 @@ describe("empty Fictionary", () => {
 
 describe("MappedSet with non-extinct species", () => {
 	beforeEach(() => {
-		fict = new Fictionary<Organism>(scientificName);
+		fict = new MappedSet<Organism>(scientificName);
 		fict.setValue(human());
 		fict.setValue(dog());
 	});

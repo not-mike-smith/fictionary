@@ -1,17 +1,17 @@
 import "jest";
 import { none } from "fp-ts/lib/Option";
 import { Organism, human, dog, direwolf, scientificName } from "./organism";
-import { ReadonlyFictionary, emptyHackMap, createHackMapper } from "../src/index";
+import { ReadonlyMappedSet, emptyHackMap, createHackMapper } from "../src/index";
 
-let fict: ReadonlyFictionary<Organism>;
+let fict: ReadonlyMappedSet<Organism>;
 const humanName = scientificName(human());
 const dogName = scientificName(dog());
 const direwolfName = scientificName(direwolf());
 
 test("empty readonly mapped set", () => {
-	const ms = new ReadonlyFictionary<Organism>(scientificName);
+	const ms = new ReadonlyMappedSet<Organism>(scientificName);
 	expect(ms).not.toBeUndefined();
-})
+});
 
 describe("ReadonlyFictionary with non-extinct animals", () => {
 	beforeEach(() => {
@@ -19,7 +19,7 @@ describe("ReadonlyFictionary with non-extinct animals", () => {
 		let hmapper = createHackMapper(scientificName);
 		hmap = hmapper.setValue(hmap)(human());
 		hmap = hmapper.setValue(hmap)(dog());
-		fict = new ReadonlyFictionary<Organism>(scientificName, hmap);
+		fict = new ReadonlyMappedSet<Organism>(scientificName, hmap);
 	});
 
 	test("containsKey", () => {

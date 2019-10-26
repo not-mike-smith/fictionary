@@ -122,7 +122,7 @@ export const createHackMapper = <TValue>(getKey: (value: TValue) => string): Hac
 	contains: (hackMap: HackMap<TValue>) => (value: TValue) => containsKey(hackMap)(getKey(value)),
 });
 
-export class ReadonlyFictionary<T> {
+export class ReadonlyMappedSet<T> {
 	protected readonly _getKey: (t: T) => string;
 	protected _hackMap: HackMap<T>;
 	protected readonly _hackMapper: HackMapper<T>;
@@ -170,11 +170,11 @@ export class ReadonlyFictionary<T> {
 	}
 
 	public copy() {
-		return new ReadonlyFictionary(this._getKey, this.currentHackMap);
+		return new ReadonlyMappedSet(this._getKey, this.currentHackMap);
 	}
 }
 
-export class AppendOnlyFictionary<T> extends ReadonlyFictionary<T> {
+export class AppendonlyMappedSet<T> extends ReadonlyMappedSet<T> {
 	constructor(getKey: (value: T) => string, hackMap: HackMap<T> = emptyHackMap<T>()) {
 		super(getKey, hackMap);
 
@@ -188,16 +188,16 @@ export class AppendOnlyFictionary<T> extends ReadonlyFictionary<T> {
 	}
 
 	public copy() {
-		return new AppendOnlyFictionary(this._getKey, this.currentHackMap);
+		return new AppendonlyMappedSet(this._getKey, this.currentHackMap);
 	}
 
 	public asReadonly() {
-		return new ReadonlyFictionary(this._getKey, this.currentHackMap);
+		return new ReadonlyMappedSet(this._getKey, this.currentHackMap);
 	}
 }
 
 // TODO MappedSet
-export class Fictionary<T> extends AppendOnlyFictionary<T> {
+export class MappedSet<T> extends AppendonlyMappedSet<T> {
 	constructor(getKey: (value: T) => string, hackMap: HackMap<T> = emptyHackMap<T>()) {
 		super(getKey, hackMap)
 		this.set = this.set.bind(this);
@@ -229,8 +229,8 @@ export class Fictionary<T> extends AppendOnlyFictionary<T> {
 	}
 
 	public copy() {
-		return new Fictionary(this._getKey, this.currentHackMap);
+		return new MappedSet(this._getKey, this.currentHackMap);
 	}
 }
 
-export default Fictionary;
+export default MappedSet;
