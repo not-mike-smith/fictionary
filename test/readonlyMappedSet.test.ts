@@ -1,7 +1,7 @@
 import "jest";
 import { none } from "fp-ts/lib/Option";
 import { Organism, human, dog, direwolf, scientificName } from "./organism";
-import { ReadonlyMappedSet, emptyHackMap, createHackMapper } from "../src/index";
+import { ReadonlyMappedSet, emptyHackMap, createHackMapper, containsKey } from "../src/index";
 
 let fict: ReadonlyMappedSet<Organism>;
 const humanName = scientificName(human());
@@ -21,6 +21,13 @@ describe("ReadonlyFictionary with non-extinct animals", () => {
 		hmap = hmapper.setValue(hmap)(dog());
 		fict = new ReadonlyMappedSet<Organism>(scientificName, hmap);
 	});
+
+	test("currentHackMap", () => {
+		const hmap = fict.currentHackMap;
+		expect(hmap).not.toBeUndefined();
+		expect(containsKey(hmap)(humanName)).toBe(true);
+		expect(containsKey(hmap)(dogName)).toBe(true);
+	})
 
 	test("containsKey", () => {
 		expect(fict.containsKey(humanName)).toBe(true);
