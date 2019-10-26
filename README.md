@@ -1,5 +1,7 @@
 # fictionary
 
+[npm package](https://www.npmjs.com/package/fictionary)
+
 ## Summary
 
 Have you ever wanted to use a dictionary or hashmap in JavaScript or TypeScript? Well keep dreaming, but this module will let you pretend you have one!
@@ -10,7 +12,9 @@ Additionally, it is available as a _mutable_ class wrapped around the `HackMap` 
 
 ## Installation 
 
-```bash
+via [npm](https://www.npmjs.com/package/fictionary)
+
+```
 > npm install fictionary
 ```
 
