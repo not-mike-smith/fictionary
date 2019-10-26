@@ -1,4 +1,4 @@
-import f from "../src/index";
+import * as f from "../src/index";
 import "jest";
 import { some, none, isSome, fold, Option } from "fp-ts/lib/Option";
 import { identity } from "fp-ts/lib/function";
