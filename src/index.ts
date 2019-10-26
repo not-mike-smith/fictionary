@@ -47,10 +47,9 @@ namespace Fictionary {
 	export const set = <TValue>(hackMap: HackMap<TValue>) => (key: string) => (value: Option<TValue>): HackMap<TValue> => {
 		if (isNone(value)) return removeAt(hackMap)(key);
 
-		return {
-			...hackMap,
-			key: value.value
-		};
+		const ret = {...hackMap};
+		ret[key] = value.value;
+		return ret;
 	}
 
 	/**
@@ -82,7 +81,7 @@ namespace Fictionary {
 	 * get array of key-value pairs in _hackMap_
 	 * @returns array of `{ key: string, value: TValue }` objects
 	 */
-	export const pairs = <TValue>(hackMap: HackMap<TValue>) => {
+	export const pairs = <TValue>(hackMap: HackMap<TValue>): {key: string, value: TValue}[] => {
 		const unsafeGetValue_ = unsafeGetValue(hackMap);
 		const f = (key: string) => ({ key, value: unsafeGetValue_(key) });
 
@@ -123,13 +122,14 @@ namespace Fictionary {
 	});
 
 	export class AppendOnlyFictionary<T> {
+		protected readonly _getKey: (t: T) => string;
 		protected _hackMap: HackMap<T>;
 		protected readonly _hackMapper: HackMapper<T>;
 
 		constructor(getKey: (value: T) => string, hackMap: HackMap<T> = emptyHackMap<T>()) {
+			this._getKey = getKey;
 			this._hackMapper = createHackMapper(getKey);
 			this._hackMap = hackMap;
-			this.currentHackMap;
 			this.containsKey = this.containsKey.bind(this);
 			this.get = this.get.bind(this);
 			this.getValue = this.getValue.bind(this);
@@ -137,9 +137,10 @@ namespace Fictionary {
 			this.keys = this.keys.bind(this);
 			this.values = this.values.bind(this);
 			this.pairs = this.pairs.bind(this);
+			this.copy = this.copy.bind(this);
 		}
 
-		public currentHackMap() {
+		public get currentHackMap() {
 			return this._hackMap;
 		}
 
@@ -170,6 +171,10 @@ namespace Fictionary {
 		public pairs() {
 			return this._hackMapper.pairs(this._hackMap);
 		}
+
+		public copy() {
+			return new AppendOnlyFictionary(this._getKey, this.currentHackMap);
+		}
 	}
 
 	export class Fictionary<T> extends AppendOnlyFictionary<T> {
@@ -180,6 +185,7 @@ namespace Fictionary {
 			this.removeAt = this.removeAt.bind(this);
 			this.remove = this.remove.bind(this);
 			this.clear = this.clear.bind(this);
+			this.copy = this.copy.bind(this);
 		}
 
 		public set(value: Option<T>) {
@@ -200,6 +206,10 @@ namespace Fictionary {
 
 		public clear() {
 			this._hackMap = emptyHackMap();
+		}
+
+		public copy() {
+			return new Fictionary(this._getKey, this.currentHackMap);
 		}
 	}
 }

@@ -26,6 +26,12 @@ test("setValue single string entry overwritten", () => {
 	expect(Object.keys(z).length).toBe(1);
 });
 
+test("can set value to key other than \"key\"", () => {
+	const x = f.emptyHackMap<string>();
+	const y = f.setValue(x)("foo")("bar");
+	expect(f.getValue(y)("foo")).toBe("bar");
+});
+
 test("setValue does not mutate HackMap", () => {
 	const x = f.emptyHackMap<string>();
 	const y = f.setValue(x)("key")("value");
@@ -108,4 +114,70 @@ test("get existing value", () => {
 	const valueOption = f.get(y)("key");
 	expect(valueOption._tag).toBe("Some");
 	expect(foldErrorOrIdentity(valueOption)).toBe("value")
-})
+});
+
+test("removeAt removes only what it's supposed to", () => {
+	const x = f.emptyHackMap<string>();
+	const y = f.set(x)("key")(some("value"));
+	const z = f.set(y)("key2")(some("value2"));
+	const a = f.removeAt(z)("key");
+	expect(f.get(a)("key")._tag).toBe("None");
+	expect(f.getValue(a)("key2")).toBe("value2");
+});
+
+test("tryAddValue adds value for key not present", () => {
+	const x = f.emptyHackMap<string>();
+	const y = f.tryAddValue(x)("key")("value");
+	expect(x).not.toBe(y);
+	expect(f.getValue(y)("key")).toBe("value");
+});
+
+test("tryAddValue returns same HackMap object if key is already present", () => {
+	const x = f.emptyHackMap<string>();
+	const y = f.setValue(x)("key")("value");
+	const z = f.tryAddValue(y)("key")("new value");
+	expect(z).toBe(y);
+	expect(f.getValue(z)("key")).toBe("value");
+});
+
+test("keys returns all keys", () => {
+	const x = f.emptyHackMap<string>();
+	expect(f.keys(x).length).toBe(0);
+	const y = f.setValue(x)("key")("value");
+	expect(f.keys(y).length).toBe(1);
+	expect(f.keys(y)[0]).toBe("key");
+	const z = f.setValue(y)("key2")("value2");
+	const zKeys = f.keys(z);
+	expect(zKeys.length).toBe(2);
+	expect(zKeys.indexOf("key")).toBeGreaterThanOrEqual(0);
+	expect(zKeys.indexOf("key2")).toBeGreaterThanOrEqual(0);
+});
+
+test("values returns all values", () => {
+	const x = f.emptyHackMap<string>();
+	expect(f.values(x).length).toBe(0);
+	const y = f.setValue(x)("key")("value");
+	expect(f.values(y).length).toBe(1);
+	expect(f.values(y)[0]).toBe("value");
+	const z = f.setValue(y)("key2")("value2");
+	const zValues = f.values(z);
+	expect(zValues.length).toBe(2);
+	expect(zValues.indexOf("value")).toBeGreaterThanOrEqual(0);
+	expect(zValues.indexOf("value2")).toBeGreaterThanOrEqual(0);
+});
+
+test("pairs returns all pairs", () => {
+	const x = f.emptyHackMap<string>();
+	expect(f.pairs(x).length).toBe(0);
+	const y = f.setValue(x)("key")("value");
+	expect(f.pairs(y).length).toBe(1);
+	expect(f.pairs(y)[0].key).toBe("key");
+	expect(f.pairs(y)[0].value).toBe("value");
+	const z = f.setValue(y)("key2")("value2");
+	const zPairs = f.pairs(z);
+	expect(zPairs.length).toBe(2);
+	expect(zPairs.findIndex(p => p.key === "key")).toBeGreaterThanOrEqual(0);
+	expect(zPairs.findIndex(p => p.key === "key2")).toBeGreaterThanOrEqual(0);
+	expect(zPairs.findIndex(p => p.value === "value")).toBeGreaterThanOrEqual(0);
+	expect(zPairs.findIndex(p => p.value === "value2")).toBeGreaterThanOrEqual(0);
+});
