@@ -121,19 +121,19 @@ namespace Fictionary {
 		tryAddValue: (hackMap: HackMap<TValue>) => (value: TValue) => tryAddValue(hackMap)(getKey(value))(value),
 	});
 
-	export class AppendOnlyFictionary<T> {
+	export class ReadonlyFictionary<T> {
 		protected readonly _getKey: (t: T) => string;
 		protected _hackMap: HackMap<T>;
 		protected readonly _hackMapper: HackMapper<T>;
 
 		constructor(getKey: (value: T) => string, hackMap: HackMap<T> = emptyHackMap<T>()) {
 			this._getKey = getKey;
-			this._hackMapper = createHackMapper(getKey);
 			this._hackMap = hackMap;
+			this._hackMapper = createHackMapper(getKey);
+
 			this.containsKey = this.containsKey.bind(this);
 			this.get = this.get.bind(this);
 			this.getValue = this.getValue.bind(this);
-			this.tryAddValue  = this.tryAddValue.bind(this);
 			this.keys = this.keys.bind(this);
 			this.values = this.values.bind(this);
 			this.pairs = this.pairs.bind(this);
@@ -156,10 +156,6 @@ namespace Fictionary {
 			return this._hackMapper.getValue(this._hackMap)(key);
 		}
 
-		public tryAddValue(value: T) {
-			this._hackMap = this._hackMapper.tryAddValue(this._hackMap)(value);
-		}
-
 		public keys() {
 			return this._hackMapper.keys(this._hackMap);
 		}
@@ -170,6 +166,23 @@ namespace Fictionary {
 
 		public pairs() {
 			return this._hackMapper.pairs(this._hackMap);
+		}
+
+		public copy() {
+			return new ReadonlyFictionary(this._getKey, this.currentHackMap);
+	}
+}
+
+	export class AppendOnlyFictionary<T> extends ReadonlyFictionary<T> {
+		constructor(getKey: (value: T) => string, hackMap: HackMap<T> = emptyHackMap<T>()) {
+			super(getKey, hackMap);
+
+			this.tryAddValue  = this.tryAddValue.bind(this);
+			this.copy = this.copy.bind(this);
+		}
+
+		public tryAddValue(value: T) {
+			this._hackMap = this._hackMapper.tryAddValue(this._hackMap)(value);
 		}
 
 		public copy() {
@@ -210,6 +223,10 @@ namespace Fictionary {
 
 		public copy() {
 			return new Fictionary(this._getKey, this.currentHackMap);
+		}
+
+		public asReadonly() {
+			return new ReadonlyFictionary(this._getKey, this.currentHackMap);
 		}
 	}
 }
