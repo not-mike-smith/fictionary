@@ -85,12 +85,28 @@ export const pairs = <TValue>(hackMap: HackMap<TValue>): {key: string, value: TV
 	const f = (key: string) => ({ key, value: unsafeGetValue_(key) });
 
 	return keys(hackMap).map(f);
-}
+};
 
 /**
  * get value associated with _key_ in _hackMap_ if it exists, else `undefined`
  */
 export const getValue = <TValue>(hackMap: HackMap<TValue>) => (key: string): TValue | undefined => hackMap[key] as TValue;
+
+export const fictionaryUpdater = <TValue>(hackMap: HackMap<TValue>) => {
+	return {
+		containsKey: containsKey(hackMap),
+		get: get(hackMap),
+		getValue: getValue(hackMap),
+		getOrThrow: getOrThrow(hackMap),
+		set: set(hackMap),
+		setValue: setValue(hackMap),
+		tryAddValue: tryAddValue(hackMap),
+		removeAt: removeAt(hackMap),
+		keys: keys(hackMap),
+		values: values(hackMap),
+		pairs: pairs(hackMap),
+	};
+};
 
 export interface HackMapper<TValue> {
 	readonly containsKey: (hackMap: HackMap<TValue>) => (key: string) => boolean;
@@ -121,6 +137,27 @@ export const createHackMapper = <TValue>(getKey: (value: TValue) => string): Hac
 	tryAddValue: (hackMap: HackMap<TValue>) => (value: TValue) => tryAddValue(hackMap)(getKey(value))(value),
 	contains: (hackMap: HackMap<TValue>) => (value: TValue) => containsKey(hackMap)(getKey(value)),
 });
+
+export type MappedSetUpdater<TValue> = {
+	readonly [P in keyof HackMapper<TValue>]: ReturnType<HackMapper<TValue>[P]>;
+};
+
+type PartialMutable<T> = {
+	-readonly [P in keyof T]?: T[P];
+};
+
+const mappedSetUpdater = <TValue>(hackMapper: HackMapper<TValue>) => (hackMap: HackMap<TValue>): MappedSetUpdater<TValue> => {
+	type InProgress = PartialMutable<MappedSetUpdater<TValue>>;
+
+	return Object.keys(hackMapper).reduce(
+		(obj: InProgress, k: string) => {
+			const key = k as keyof HackMapper<TValue>;
+			obj[key] = hackMapper[key](hackMap) as any; // trust me
+			return obj;
+		},
+		{} as InProgress
+	) as MappedSetUpdater<TValue>;
+};
 
 export class ReadonlyMappedSet<T> {
 	protected readonly _getKey: (t: T) => string;
